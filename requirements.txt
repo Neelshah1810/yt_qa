@@ -1,0 +1,16 @@
+streamlit
+python-dotenv
+langchain
+langchain-core
+langchain-community
+langchain-text-splitters
+langchain-classic
+langchain-groq
+langchain-google-genai
+faiss-cpu
+yt-dlp
+youtube-transcript-api
+groq
+static-ffmpeg
+openai-whisper
+rank-bm25
