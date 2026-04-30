@@ -78,7 +78,7 @@ def _fetch_metadata(youtube_url):
     if os.path.exists(cookies_path):
         ydl_opts['cookiefile'] = cookies_path
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        info = ydl.extract_info(youtube_url, download=False)
+        info = ydl.extract_info(youtube_url, download=False, process=False)
 
     title = info.get('title', 'Unknown Title')
     channel = info.get('uploader', info.get('channel', 'Unknown Channel'))
@@ -250,7 +250,8 @@ def _fetch_transcript_groq_whisper(youtube_url, detected_lang=None):
 
     try:
         ydl_opts = {
-            'format': 'bestaudio/best',
+            'format': 'bestaudio[ext=webm]/bestaudio[ext=m4a]/bestaudio',
+            'extractor_args': {'youtube': {'skip': ['dash', 'hls']}},
             'outtmpl': os.path.join(temp_dir, 'audio.%(ext)s'),
             'quiet': True,
             'no_warnings': True,
@@ -339,7 +340,8 @@ def _fetch_transcript_audio(youtube_url, detected_lang=None):
 
     try:
         ydl_opts = {
-            'format': 'bestaudio/best',
+            'format': 'bestaudio[ext=webm]/bestaudio[ext=m4a]/bestaudio',
+            'extractor_args': {'youtube': {'skip': ['dash', 'hls']}},
             'outtmpl': os.path.join(temp_dir, 'audio.%(ext)s'),
             'quiet': True,
             'no_warnings': True,
@@ -392,8 +394,12 @@ def fetch_transcript(youtube_url):
     detected_lang = None
     try:
         import yt_dlp
-        with yt_dlp.YoutubeDL({'quiet': True, 'skip_download': True, 'no_check_certificates': True}) as ydl:
-            info = ydl.extract_info(youtube_url, download=False)
+        _cp = os.path.join(os.path.dirname(__file__), "cookies.txt")
+        _ldo = {'quiet': True, 'skip_download': True, 'no_check_certificates': True}
+        if os.path.exists(_cp):
+            _ldo['cookiefile'] = _cp
+        with yt_dlp.YoutubeDL(_ldo) as ydl:
+            info = ydl.extract_info(youtube_url, download=False, process=False)
             detected_lang = info.get('language', None)
             if not detected_lang:
                 auto_subs = info.get('automatic_captions', {})
