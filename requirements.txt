@@ -11,6 +11,5 @@ faiss-cpu
 yt-dlp
 youtube-transcript-api
 groq
-static-ffmpeg
 openai-whisper
 rank-bm25

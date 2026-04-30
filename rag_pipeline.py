@@ -227,9 +227,8 @@ def _fetch_transcript_groq_whisper(youtube_url, detected_lang=None):
     import yt_dlp
     from groq import Groq
 
-    import static_ffmpeg
-    ffmpeg_path, _ = static_ffmpeg.run.get_or_fetch_platform_executables_else_raise()
-    os.environ["PATH"] = os.path.dirname(ffmpeg_path) + os.pathsep + os.environ["PATH"]
+    # System ffmpeg is provided by packages.txt on Streamlit Cloud
+    # No need to manually set PATH or fetch executables
 
     temp_dir = os.path.join(os.path.dirname(__file__), "_temp_audio")
     os.makedirs(temp_dir, exist_ok=True)
@@ -317,9 +316,7 @@ def _fetch_transcript_audio(youtube_url, detected_lang=None):
     import yt_dlp
     import whisper
 
-    import static_ffmpeg
-    ffmpeg_path, _ = static_ffmpeg.run.get_or_fetch_platform_executables_else_raise()
-    os.environ["PATH"] = os.path.dirname(ffmpeg_path) + os.pathsep + os.environ["PATH"]
+    # System ffmpeg is provided by packages.txt on Streamlit Cloud
 
     temp_dir = os.path.join(os.path.dirname(__file__), "_temp_audio")
     os.makedirs(temp_dir, exist_ok=True)
