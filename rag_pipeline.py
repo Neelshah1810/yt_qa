@@ -72,6 +72,11 @@ def _fetch_metadata(youtube_url):
         'skip_download': True,
         'no_check_certificates': True,
     }
+
+    # Use cookies if available to avoid 403 Forbidden
+    cookies_path = os.path.join(os.path.dirname(__file__), "cookies.txt")
+    if os.path.exists(cookies_path):
+        ydl_opts['cookiefile'] = cookies_path
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(youtube_url, download=False)
 
@@ -250,6 +255,7 @@ def _fetch_transcript_groq_whisper(youtube_url, detected_lang=None):
             'quiet': True,
             'no_warnings': True,
             'no_check_certificates': True,
+            'cookiefile': os.path.join(os.path.dirname(__file__), 'cookies.txt') if os.path.exists(os.path.join(os.path.dirname(__file__), 'cookies.txt')) else None
         }
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -338,6 +344,7 @@ def _fetch_transcript_audio(youtube_url, detected_lang=None):
             'quiet': True,
             'no_warnings': True,
             'no_check_certificates': True,
+            'cookiefile': os.path.join(os.path.dirname(__file__), 'cookies.txt') if os.path.exists(os.path.join(os.path.dirname(__file__), 'cookies.txt')) else None
         }
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
