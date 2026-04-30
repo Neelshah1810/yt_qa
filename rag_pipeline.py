@@ -1,4 +1,14 @@
 import os
+
+# ── Streamlit Cloud Fix ───────────────────────────────────────────
+# static_ffmpeg writes a lock.file inside site-packages, which is
+# read-only on Streamlit Cloud. Redirect it to /tmp BEFORE any
+# other import triggers it.
+try:
+    import static_ffmpeg.run as _sfr
+    _sfr.LOCK_FILE = "/tmp/static_ffmpeg.lock"
+except ImportError:
+    pass
 import re
 import shutil
 from dotenv import load_dotenv
