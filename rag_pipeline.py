@@ -250,7 +250,7 @@ def _fetch_transcript_groq_whisper(youtube_url, detected_lang=None):
 
     try:
         ydl_opts = {
-            'format': 'ba[ext=m4a][abr<=48]/ba[abr<=48]/ba',
+            'format': 'bestaudio/best',
             'outtmpl': os.path.join(temp_dir, 'audio.%(ext)s'),
             'quiet': True,
             'no_warnings': True,
@@ -339,7 +339,7 @@ def _fetch_transcript_audio(youtube_url, detected_lang=None):
 
     try:
         ydl_opts = {
-            'format': 'ba[ext=m4a][abr<=48]/ba[abr<=48]/ba',
+            'format': 'bestaudio/best',
             'outtmpl': os.path.join(temp_dir, 'audio.%(ext)s'),
             'quiet': True,
             'no_warnings': True,
