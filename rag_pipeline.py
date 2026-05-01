@@ -72,12 +72,13 @@ def _fetch_metadata(youtube_url):
         'skip_download': True,
         'no_check_certificates': True,
         'js_runtimes': {'node': {}},
+        'extractor_args': {'youtube': {'client': ['android', 'ios']}},
     }
 
     # Use cookies if available to avoid 403 Forbidden
-    cookies_path = os.path.join(os.path.dirname(__file__), "cookies.txt")
-    if os.path.exists(cookies_path):
-        ydl_opts['cookiefile'] = cookies_path
+    # cookies_path = os.path.join(os.path.dirname(__file__), "cookies.txt")
+    # if os.path.exists(cookies_path):
+    #     ydl_opts['cookiefile'] = cookies_path
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(youtube_url, download=False, process=False)
 
@@ -252,13 +253,13 @@ def _fetch_transcript_groq_whisper(youtube_url, detected_lang=None):
     try:
         ydl_opts = {
             'format': 'bestaudio[ext=webm]/bestaudio[ext=m4a]/bestaudio',
-            'extractor_args': {'youtube': {'skip': ['dash', 'hls']}},
+            'extractor_args': {'youtube': {'skip': ['dash', 'hls'], 'client': ['android', 'ios']}},
             'outtmpl': os.path.join(temp_dir, 'audio.%(ext)s'),
             'quiet': True,
             'no_warnings': True,
             'no_check_certificates': True,
             'js_runtimes': {'node': {}},
-            'cookiefile': os.path.join(os.path.dirname(__file__), 'cookies.txt') if os.path.exists(os.path.join(os.path.dirname(__file__), 'cookies.txt')) else None
+            # 'cookiefile': os.path.join(os.path.dirname(__file__), 'cookies.txt') if os.path.exists(os.path.join(os.path.dirname(__file__), 'cookies.txt')) else None
         }
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -343,13 +344,13 @@ def _fetch_transcript_audio(youtube_url, detected_lang=None):
     try:
         ydl_opts = {
             'format': 'bestaudio[ext=webm]/bestaudio[ext=m4a]/bestaudio',
-            'extractor_args': {'youtube': {'skip': ['dash', 'hls']}},
+            'extractor_args': {'youtube': {'skip': ['dash', 'hls'], 'client': ['android', 'ios']}},
             'outtmpl': os.path.join(temp_dir, 'audio.%(ext)s'),
             'quiet': True,
             'no_warnings': True,
             'no_check_certificates': True,
             'js_runtimes': {'node': {}},
-            'cookiefile': os.path.join(os.path.dirname(__file__), 'cookies.txt') if os.path.exists(os.path.join(os.path.dirname(__file__), 'cookies.txt')) else None
+            # 'cookiefile': os.path.join(os.path.dirname(__file__), 'cookies.txt') if os.path.exists(os.path.join(os.path.dirname(__file__), 'cookies.txt')) else None
         }
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -398,9 +399,9 @@ def fetch_transcript(youtube_url):
     try:
         import yt_dlp
         _cp = os.path.join(os.path.dirname(__file__), "cookies.txt")
-        _ldo = {'quiet': True, 'skip_download': True, 'no_check_certificates': True, 'js_runtimes': {'node': {}}}
-        if os.path.exists(_cp):
-            _ldo['cookiefile'] = _cp
+        _ldo = {'quiet': True, 'skip_download': True, 'no_check_certificates': True, 'js_runtimes': {'node': {}}, 'extractor_args': {'youtube': {'client': ['android', 'ios']}}}
+        # if os.path.exists(_cp):
+        #     _ldo['cookiefile'] = _cp
         with yt_dlp.YoutubeDL(_ldo) as ydl:
             info = ydl.extract_info(youtube_url, download=False, process=False)
             detected_lang = info.get('language', None)
