@@ -71,6 +71,7 @@ def _fetch_metadata(youtube_url):
         'no_warnings': True,
         'skip_download': True,
         'no_check_certificates': True,
+        'js_runtimes': {'node': {}},
     }
 
     # Use cookies if available to avoid 403 Forbidden
@@ -256,6 +257,7 @@ def _fetch_transcript_groq_whisper(youtube_url, detected_lang=None):
             'quiet': True,
             'no_warnings': True,
             'no_check_certificates': True,
+            'js_runtimes': {'node': {}},
             'cookiefile': os.path.join(os.path.dirname(__file__), 'cookies.txt') if os.path.exists(os.path.join(os.path.dirname(__file__), 'cookies.txt')) else None
         }
 
@@ -346,6 +348,7 @@ def _fetch_transcript_audio(youtube_url, detected_lang=None):
             'quiet': True,
             'no_warnings': True,
             'no_check_certificates': True,
+            'js_runtimes': {'node': {}},
             'cookiefile': os.path.join(os.path.dirname(__file__), 'cookies.txt') if os.path.exists(os.path.join(os.path.dirname(__file__), 'cookies.txt')) else None
         }
 
@@ -395,7 +398,7 @@ def fetch_transcript(youtube_url):
     try:
         import yt_dlp
         _cp = os.path.join(os.path.dirname(__file__), "cookies.txt")
-        _ldo = {'quiet': True, 'skip_download': True, 'no_check_certificates': True}
+        _ldo = {'quiet': True, 'skip_download': True, 'no_check_certificates': True, 'js_runtimes': {'node': {}}}
         if os.path.exists(_cp):
             _ldo['cookiefile'] = _cp
         with yt_dlp.YoutubeDL(_ldo) as ydl:
