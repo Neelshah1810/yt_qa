@@ -64,71 +64,29 @@ def get_video_id(url):
 
 # ── Step 1b: Fetch Video Metadata ────────────────────────────────
 def _fetch_metadata(youtube_url):
-    """Use yt-dlp to get video title, channel, description, language, duration, and category."""
-    import yt_dlp
-    ydl_opts = {
-        'quiet': True,
-        'no_warnings': True,
-        'skip_download': True,
-        'no_check_certificates': True,
-        'js_runtimes': {'node': {}},
-        'extractor_args': {'youtube': {'client': ['android', 'ios']}},
-    }
-
-    # Use cookies if available to avoid 403 Forbidden
-    # cookies_path = os.path.join(os.path.dirname(__file__), "cookies.txt")
-    # if os.path.exists(cookies_path):
-    #     ydl_opts['cookiefile'] = cookies_path
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        info = ydl.extract_info(youtube_url, download=False, process=False)
-
-    title = info.get('title', 'Unknown Title')
-    channel = info.get('uploader', info.get('channel', 'Unknown Channel'))
-    description = info.get('description', '')
-    if len(description) > 500:
-        description = description[:500] + "..."
-
-    duration_sec = info.get('duration', 0)
-    if duration_sec:
-        hours, remainder = divmod(int(duration_sec), 3600)
-        minutes, seconds = divmod(remainder, 60)
-        if hours > 0:
-            duration_str = f"{hours}h {minutes}m {seconds}s"
-        else:
-            duration_str = f"{minutes}m {seconds}s"
-    else:
-        duration_str = 'Unknown'
-
-    language = info.get('language', None)
-    if not language:
-        subs = info.get('subtitles', {})
-        auto_subs = info.get('automatic_captions', {})
-        if subs:
-            language = list(subs.keys())[0]
-        elif auto_subs:
-            language = list(auto_subs.keys())[0]
-    language = language or 'Unknown'
-
-    lang_map = {
-        'en': 'English', 'hi': 'Hindi', 'es': 'Spanish', 'fr': 'French',
-        'de': 'German', 'pt': 'Portuguese', 'ja': 'Japanese', 'ko': 'Korean',
-        'zh': 'Chinese', 'ar': 'Arabic', 'ru': 'Russian', 'it': 'Italian',
-        'bn': 'Bengali', 'mr': 'Marathi', 'ta': 'Tamil', 'te': 'Telugu',
-        'pa': 'Punjabi', 'gu': 'Gujarati', 'kn': 'Kannada', 'ml': 'Malayalam',
-        'ur': 'Urdu', 'th': 'Thai', 'vi': 'Vietnamese', 'tr': 'Turkish',
-    }
-    language_full = lang_map.get(language, language)
-
-    categories = info.get('categories', [])
-    category = categories[0] if categories else 'Unknown'
+    """Use YouTube oEmbed API to get video title and channel (Bypasses Datacenter IP blocks)."""
+    import requests
+    
+    title = 'Unknown Title'
+    channel = 'Unknown Channel'
+    
+    try:
+        oembed_url = f"https://www.youtube.com/oembed?url={youtube_url}&format=json"
+        response = requests.get(oembed_url, timeout=10)
+        if response.status_code == 200:
+            data = response.json()
+            title = data.get('title', 'Unknown Title')
+            channel = data.get('author_name', 'Unknown Channel')
+    except Exception as e:
+        print(f"[INFO] oEmbed API failed: {e}")
 
     return {
         'title': title,
         'channel': channel,
-        'description': description,
-        'duration': duration_str,
-        'language': language_full,
-        'category': category,
+        'description': '',
+        'duration': 'Unknown',
+        'language': 'Unknown',
+        'category': 'Unknown',
     }
 
 # ── Helper: detect if transcript is mostly Hindi/Devanagari ──────
@@ -444,8 +402,11 @@ def fetch_transcript(youtube_url):
 
     # Tier 3: Local Whisper (always English output via translate task)
     print("[INFO] Falling back to local Whisper transcription (this may be slow)...")
-    transcript_text = _fetch_transcript_audio(youtube_url, detected_lang=detected_lang)
-    return transcript_text
+    try:
+        transcript_text = _fetch_transcript_audio(youtube_url, detected_lang=detected_lang)
+        return transcript_text
+    except Exception as e:
+        raise ValueError(f"Transcription failed across all tiers. The video might be blocked by YouTube, lack captions, or restrict downloads. Original error: {e}")
 
 # ── Step 3: Sentence-Aware Chunking with Metadata ────────────────
 def _split_into_sentences(text):
