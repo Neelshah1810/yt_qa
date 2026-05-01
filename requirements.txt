@@ -8,7 +8,7 @@ langchain-classic
 langchain-groq
 langchain-google-genai
 faiss-cpu
-yt-dlp
+yt-dlp[default]
 youtube-transcript-api
 groq
 openai-whisper
